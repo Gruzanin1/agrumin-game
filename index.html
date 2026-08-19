@@ -114,7 +114,7 @@
             if(!plotUpgrades[id]) plotUpgrades[id] = { sieve: 0, drill: 0 };
             let ups = plotUpgrades[id];
             document.getElementById('modalTitle').innerText = p.region === "marsh" ? "Močvara" : p.region === "jungle" ? "Džungla" : "Kanjon";
-            document.getElementById('modalLoc').innerText = "Pozicija: " + (p.r+1) + ", " + (p.c+1);
+                        document.getElementById('modalLoc').innerText = "Pozicija: " + (p.r+1) + ", " + (p.c+1);
             document.getElementById('modalQuality').innerText = "Proizvodnja: " + getPlotIncome(id).toFixed(1) + "/sek";
             let box = document.getElementById('modalActionBox');
             if (owned) {
@@ -126,6 +126,7 @@
             }
             document.getElementById('plotModal').style.display = 'flex';
         }
+
         function openTasks() {
             let container = document.getElementById('tasksContainer'); container.innerHTML = '';
             tasksList.forEach(t => {
@@ -135,21 +136,26 @@
             });
             document.getElementById('tasksModal').style.display = 'flex';
         }
+
         function closeM(id) { document.getElementById(id).style.display = 'none'; }
+        
         function buyPlot(pr) {
             if (score >= pr) { score -= pr; ownedPlots.push(activeId); plotUpgrades[activeId] = { sieve: 0, drill: 0 }; closeM('plotModal'); buildMap(); }
             else { alert('Nemate dovoljno poena!'); }
         }
+
         function buyMach(type, cost) {
             if (score >= cost) { score -= cost; plotUpgrades[activeId][type] += 1; openPlot(activeId); updateUI(); }
             else { alert('Nemate dovoljno poena!'); }
         }
+
         function claimTask(id) {
             let t = tasksList.find(x => x.id === id);
             if (t.link) window.open(t.link, '_blank');
             if (t.check && !t.check()) { alert('Niste ispunili uslov!'); return; }
             score += t.reward; completedTasks.push(id); updateUI(); openTasks();
         }
+
         setInterval(() => { let inc = getIncome(); if (inc > 0) { score += inc / 10; updateUI(); } }, 100);
         buildMap();
     </script>
