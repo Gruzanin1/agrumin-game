@@ -88,6 +88,7 @@
             margin-bottom: 5px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
         .energy-bar {
             width: 100%;
@@ -238,11 +239,11 @@
     </div>
 
     <script>
-        let score = 0;
-        let energy = 1000;
+        let score = parseFloat(localStorage.getItem('agrumin_score')) || 0;
+        let energy = parseInt(localStorage.getItem('agrumin_energy')) || 1000;
         const maxEnergy = 1000;
-        let clickPower = 1;
-        let autoIncome = 0;
+        let clickPower = parseInt(localStorage.getItem('agrumin_clickPower')) || 1;
+        let autoIncome = parseInt(localStorage.getItem('agrumin_autoIncome')) || 0;
 
         const scoreEl = document.getElementById('score');
         const energyTextEl = document.getElementById('energyText');
@@ -251,10 +252,13 @@
         const gameSpaceEl = document.getElementById('gameSpace');
         const shopModalEl = document.getElementById('shopModal');
 
+        updateUI();
+
         crystalEl.addEventListener('click', (e) => {
             if (energy >= clickPower) {
                 score += clickPower;
                 energy -= clickPower;
+                saveData();
                 updateUI();
                 createFloatingText(e.clientX, e.clientY, `+${clickPower}`);
             }
@@ -277,6 +281,13 @@
             energyFillEl.style.width = `${percentage}%`;
         }
 
+        function saveData() {
+            localStorage.setItem('agrumin_score', score);
+            localStorage.setItem('agrumin_energy', energy);
+            localStorage.setItem('agrumin_clickPower', clickPower);
+            localStorage.setItem('agrumin_autoIncome', autoIncome);
+        }
+
         function toggleShop(show) {
             shopModalEl.style.display = show ? 'flex' : 'none';
         }
@@ -286,27 +297,22 @@
                 score -= cost;
                 if (type === 'pickaxe') {
                     clickPower += 5;
-                    alert('Kupili ste Čelični kramp! Jači klikovi za brže sakupljanje.');
+                    alert('Kupili ste Čelični kramp!');
                 } else if (type === 'drill') {
                     autoIncome += 10;
-                    alert('Kupili ste Auto-bušilicu! Poeni se sada skupljaju sami.');
+                    alert('Kupili ste Auto-bušilicu!');
                 }
+                saveData();
                 updateUI();
                 toggleShop(false);
             } else {
-                alert('Nemate dovoljno poena!');
-            }
+alert('Nemate dovoljno poena!');
+            }}setInterval(() => {let changed = false;
+                                 if (autoIncome > 0)
+        {score += autoIncome / 10;
+         changed = true;
         }
-
-        setInterval(() => {
-            if (autoIncome > 0) {
-                score += autoIncome / 10;
-            }
-            if (energy < maxEnergy) {
-                energy = Math.min(maxEnergy, energy + 1);
-            }
-            updateUI();
-        }, 100);
-    </script>
-</body>
-</html>
+        if (energy < maxEnergy) {
+            energy = Math.min(maxEnergy, energy + 1);
+                                  changed = true;
+                                 }
