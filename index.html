@@ -3,178 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agrumin: 2D Carstvo Parcela</title>
+    <title>Agrumin: 2D Mreža</title>
     <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #0b0f19 0%, #02050a 100%);
-            color: #ffffff;
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .header {
-            text-align: center;
-            margin-top: 10px;
-            width: 100%;
-        }
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #00ffcc;
-            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
-            margin: 0;
-        }
-        .score-container {
-            font-size: 28px;
-            font-weight: 800;
-            margin: 5px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-        .income-text {
-            font-size: 14px;
-            color: #00bbff;
-            margin-top: -5px;
-            margin-bottom: 5px;
-        }
-        .map-container {
-            flex: 1;
-            width: 100%;
-            max-width: 440px;
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .grid-map {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
-            gap: 4px;
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 4px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 255, 204, 0.2);
-        }
-        .plot {
-            border-radius: 4px;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.1s;
-            border: 1px solid rgba(0,0,0,0.3);
-        }
-        .plot:active {
-            transform: scale(0.9);
-        }
-        .reg-marsh { background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%); }
-        .reg-jungle { background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%); }
-        .reg-canyon { background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%); }
-        
-        .plot.owned {
-            background: linear-gradient(135deg, #b58900 0%, #ffb703 100%) !important;
-            box-shadow: inset 0 0 8px rgba(255,255,255,0.6), 0 0 8px rgba(255, 183, 3, 0.4);
-            border: 1px solid #ffffff;
-            position: relative;
-        }
-        .plot.owned::after {
-            content: '⛏️';
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
-        }
-        .footer-info {
-            width: 100%;
-            padding: 15px;
-            background: rgba(11, 15, 25, 0.9);
-            border-top: 1px solid rgba(0, 255, 204, 0.2);
-            text-align: center;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(2, 5, 10, 0.85);
-            z-index: 10;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: #0b0f19;
-            width: 85%;
-            max-width: 360px;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #00ffcc;
-            text-align: center;
-        }
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+        body { margin: 0; background: linear-gradient(135deg, #0b0f19, #02050a); color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
+        .header { text-align: center; margin-top: 10px; width: 100%; }
+        .title { font-size: 22px; font-weight: bold; color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.5); margin: 0; }
+        .score-container { font-size: 26px; font-weight: 800; margin: 5px 0; }
+        .income-text { font-size: 13px; color: #00bbff; margin-bottom: 5px; }
+        .map-container { flex: 1; width: 100%; max-width: 400px; padding: 10px; display: flex; align-items: center; }
+        .grid-map { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; width: 100%; aspect-ratio: 1; background: rgba(255,255,255,0.02); padding: 4px; border-radius: 8px; border: 1px solid rgba(0,255,204,0.2); }
+        .plot { border-radius: 4px; cursor: pointer; border: 1px solid rgba(0,0,0,0.3); aspect-ratio: 1; }
+        .reg-marsh { background: linear-gradient(135deg, #1b4332, #2d6a4f); }
+        .reg-jungle { background: linear-gradient(135deg, #1a365d, #2b6cb0); }
+        .reg-canyon { background: linear-gradient(135deg, #4c1d95, #6d28d9); }
+        .plot.owned { background: linear-gradient(135deg, #b58900, #ffb703) !important; border: 1px solid #fff; position: relative; }
+        .plot.owned::after { content: '⛏️'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 12px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2,5,10,0.85); z-index: 10; justify-content: center; align-items: center; }
+        .modal-content { background: #0b0f19; width: 85%; max-width: 320px; padding: 20px; border-radius: 12px; border: 1px solid #00ffcc; text-align: center; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-buy { background: #00ffcc; color: #02050a; }
         .btn-close { background: #2d3748; color: white; }
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            font-size: 11px;
-            margin-bottom: 5px;
-        }
-        .legend-item { display: flex; align-items: center; gap: 4px; }
-        .legend-box { width: 12px; height: 12px; border-radius: 2px; }
+        .legend { display: flex; justify-content: center; gap: 8px; font-size: 10px; margin-bottom: 5px; }
+        .legend-item { display: flex; align-items: center; gap: 3px; }
+        .legend-box { width: 10px; height: 10px; border-radius: 2px; }
     </style>
 </head>
 <body>
-
     <div class="header">
         <p class="title">AGRUMIN: MAPA PARCELA</p>
-        <div class="score-container">
-            <span>✨</span>
-            <span id="scoreDisplay">0</span>
-        </div>
-        <div class="income-text">Pasivna zarada: +<span id="incomeDisplay">0</span> poena/sek</div>
-        
+        <div class="score-container">✨ <span id="scoreDisplay">0</span></div>
+        <div class="income-text">Zarada: +<span id="incomeDisplay">0</span>/sek</div>
         <div class="legend">
             <div class="legend-item"><div class="legend-box reg-marsh"></div>Močvara (500)</div>
             <div class="legend-item"><div class="legend-box reg-jungle"></div>Džungla (2500)</div>
             <div class="legend-item"><div class="legend-box reg-canyon"></div>Kanjon (10000)</div>
         </div>
     </div>
-
-    <div class="map-container">
-        <div class="grid-map" id="mapGrid"></div>
-    </div>
-
-    <div class="footer-info">
-        <span style="color: #a0aec0; font-size: 13px;">Kliknite na bilo koje polje na mapi da vidite detalje ili kupite plac.</span>
-    </div>
-
+    <div class="map-container"><div class="grid-map" id="mapGrid"></div></div>
     <div class="modal" id="plotModal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="color: #00ffcc; margin-top:0;">Parcela</h3>
-            <p id="modalLoc"></p>
-            <p id="modalQuality"></p>
-            <p id="modalPrice" style="font-weight: bold; font-size: 18px;"></p>
+            <h3 id="modalTitle" style="color: #00ffcc; margin:0;"></h3>
+            <p id="modalLoc"></p><p id="modalQuality"></p><p id="modalPrice" style="font-weight:bold; font-size:16px;"></p>
             <div id="modalActionBox"></div>
             <button class="btn btn-close" onclick="closeModal()">Zatvori</button>
         </div>
@@ -182,117 +52,53 @@
     <script>
         let score = parseFloat(localStorage.getItem('ag_score')) || 1000;
         let ownedPlots = JSON.parse(localStorage.getItem('ag_ownedPlots')) || [];
-
         let mapData = [];
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
-                let id = row * 8 + col;
-                let region = "marsh";
-                let price = 500;
-                let baseIncome = 1;
-
-                if (row >= 3 && row <= 4 && col >= 3 && col <= 4) {
-                    region = "canyon";
-                    price = 10000;
-                    baseIncome = 25;
-                } else if (row >= 1 && row <= 6 && col >= 1 && col <= 6) {
-                    region = "jungle";
-                    price = 2500;
-                    baseIncome = 6;
-                }
-
-                let quality = 50 + (id % 7) * 25;
-                mapData.push({ id, row, col, region, price, baseIncome, quality });
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                let id = r * 8 + c, reg = "marsh", pr = 500, inc = 1;
+                if (r >= 3 && r <= 4 && c >= 3 && c <= 4) { reg = "canyon"; pr = 10000; inc = 25; }
+                else if (r >= 1 && r <= 6 && c >= 1 && c <= 6) { reg = "jungle"; pr = 2500; inc = 6; }
+                mapData.push({ id, r, c, region: reg, price: pr, baseIncome: inc, qual: 50 + (id % 7) * 25 });
             }
         }
-
-        const gridEl = document.getElementById('mapGrid');
-        const scoreDisplayEl = document.getElementById('scoreDisplay');
-        const incomeDisplayEl = document.getElementById('incomeDisplay');
-        const modalEl = document.getElementById('plotModal');
-
-        let activePlotId = null;
-
+        const grid = document.getElementById('mapGrid'), scoreEl = document.getElementById('scoreDisplay'), incEl = document.getElementById('incomeDisplay'), modal = document.getElementById('plotModal');
+        let activeId = null;
         function buildMap() {
-            gridEl.innerHTML = '';
-            mapData.forEach(plot => {
+            grid.innerHTML = '';
+            mapData.forEach(p => {
                 const cell = document.createElement('div');
-                cell.className = `plot reg-${plot.region}`;
-                if (ownedPlots.includes(plot.id)) {
-                    cell.classList.add('owned');
-                }
-                cell.onclick = () => openPlotDetails(plot.id);
-                gridEl.appendChild(cell);
+                cell.className = `plot reg-${p.region}` + (ownedPlots.includes(p.id) ? ' owned' : '');
+                cell.onclick = () => openPlot(p.id);
+                grid.appendChild(cell);
             });
-            updateHeader();
+            updateUI();
         }
-
-        function calculateTotalIncome() {
-            let total = 0;
-            mapData.forEach(plot => {
-                if (ownedPlots.includes(plot.id)) {
-                    total += plot.baseIncome * (plot.quality / 100);
-                }
-            });
-            return total;
+        function getIncome() {
+            let t = 0;
+            mapData.forEach(p => { if (ownedPlots.includes(p.id)) t += p.baseIncome * (p.qual / 100); });
+            return t;
         }
-
-        function updateHeader() {
-            scoreDisplayEl.innerText = Math.floor(score);
-            incomeDisplayEl.innerText = calculateTotalIncome().toFixed(1);
+        function updateUI() {
+            scoreEl.innerText = Math.floor(score);
+            incEl.innerText = getIncome().toFixed(1);
             localStorage.setItem('ag_score', score);
             localStorage.setItem('ag_ownedPlots', JSON.stringify(ownedPlots));
         }
-
-        function openPlotDetails(id) {
-            activePlotId = id;
-            const plot = mapData[id];
-            const isOwned = ownedPlots.includes(id);
-
-            let regName = plot.region === "marsh" ? "Fluorescentna Močvara" : plot.region === "jungle" ? "Maglovita Džungla" : "Lebdeći Kanjon";
-            
-            document.getElementById('modalTitle').innerText = regName;
-            document.getElementById('modalLoc').innerText = `Lokacija: Red ${plot.row + 1}, Polje ${plot.col + 1}`;
-            document.getElementById('modalQuality').innerText = `Kvalitet: ${plot.quality}% (${(plot.baseIncome * (plot.quality/100)).toFixed(1)} poena/sek)`;
-            
-            const actionBox = document.getElementById('modalActionBox');
-            const priceEl = document.getElementById('modalPrice');
-
-            if (isOwned) {
-                priceEl.innerText = "VLASNIŠTVO: Vaš plac aktivno rudari!";
-                actionBox.innerHTML = '';
-            } else {
-                priceEl.innerText = `Cena: ${plot.price} poena`;
-                actionBox.innerHTML = `<button class="btn btn-buy" onclick="buyPlot(${plot.price})">Kupi ovaj plac</button>`;
-            }
-
-            modalEl.style.display = 'flex';
+        function openPlot(id) {
+            activeId = id; const p = mapData[id], owned = ownedPlots.includes(id);
+            document.getElementById('modalTitle').innerText = p.region === "marsh" ? "Močvara" : p.region === "jungle" ? "Džungla" : "Kanjon";
+            document.getElementById('modalLoc').innerText = `Pozicija: ${p.r+1}, ${p.c+1}`;
+            document.getElementById('modalQuality').innerText = `Kvalitet: ${p.qual}% (${(p.baseIncome*(p.qual/100)).toFixed(1)}/sek)`;
+            document.getElementById('modalPrice').innerText = owned ? "VLASNIŠTVO: Plac aktivno rudari!" : `Cena: ${p.price} poena`;
+            document.getElementById('modalActionBox').innerHTML = owned ? '' : `<button class="btn btn-buy" onclick="buyPlot(${p.price})">Kupi plac</button>`;
+            modal.style.display = 'flex';
         }
-
-        function closeModal() {
-            modalEl.style.display = 'none';
+        function closeModal() { modal.style.display = 'none'; }
+        function buyPlot(pr) {
+            if (score >= pr) { score -= pr; ownedPlots.push(activeId); closeModal(); buildMap(); }
+            else { alert('Nemate dovoljno poena!'); }
         }
-
-        function buyPlot(price) {
-            if (score >= price) {
-                score -= price;
-                ownedPlots.push(activePlotId);
-                closeModal();
-                buildMap();
-                alert('Uspešno kupljen plac!');
-            } else {
-                alert('Nemate dovoljno poena!');
-            }
-        }
-
-        setInterval(() => {
-            let income = calculateTotalIncome();
-            if (income > 0) {
-                score += income / 10;
-                updateHeader();
-            }
-        }, 100);
-
+        setInterval(() => { let inc = getIncome(); if (inc > 0) { score += inc / 10; updateUI(); } }, 100);
         buildMap();
     </script>
 </body>
