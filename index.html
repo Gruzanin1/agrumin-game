@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="sr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agrumin: 2D Mreža</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrumin: 2D Carstvo</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
         body { margin: 0; background: linear-gradient(135deg, #0b0f19, #02050a); color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
@@ -21,30 +20,33 @@
         .plot.owned::after { content: '⛏️'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 12px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2,5,10,0.85); z-index: 10; justify-content: center; align-items: center; }
         .modal-content { background: #0b0f19; width: 85%; max-width: 320px; padding: 20px; border-radius: 12px; border: 1px solid #00ffcc; text-align: center; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn { width: 100%; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 8px; }
         .btn-buy { background: #00ffcc; color: #02050a; }
         .btn-close { background: #2d3748; color: white; }
+        .btn-up { background: #00bbff; color: white; font-size: 12px; padding: 6px; }
         .legend { display: flex; justify-content: center; gap: 8px; font-size: 10px; margin-bottom: 5px; }
         .legend-item { display: flex; align-items: center; gap: 3px; }
         .legend-box { width: 10px; height: 10px; border-radius: 2px; }
+        .up-box { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
     <div class="header">
-        <p class="title">AGRUMIN: MAPA PARCELA</p>
+        <p class="title">AGRUMIN: 2D IMPERIJA</p>
         <div class="score-container">✨ <span id="scoreDisplay">0</span></div>
-        <div class="income-text">Zarada: +<span id="incomeDisplay">0</span>/sek</div>
+        <div class="income-text">Ukupna Zarada: +<span id="incomeDisplay">0</span>/sek</div>
         <div class="legend">
-            <div class="legend-item"><div class="legend-box reg-marsh"></div>Močvara (500)</div>
-            <div class="legend-item"><div class="legend-box reg-jungle"></div>Džungla (2500)</div>
-            <div class="legend-item"><div class="legend-box reg-canyon"></div>Kanjon (10000)</div>
+            <div class="legend-item"><div class="legend-box reg-marsh"></div>Močvara</div>
+            <div class="legend-item"><div class="legend-box reg-jungle"></div>Džungla</div>
+            <div class="legend-item"><div class="legend-box reg-canyon"></div>Kanjon</div>
         </div>
     </div>
     <div class="map-container"><div class="grid-map" id="mapGrid"></div></div>
     <div class="modal" id="plotModal">
         <div class="modal-content">
             <h3 id="modalTitle" style="color: #00ffcc; margin:0;"></h3>
-            <p id="modalLoc"></p><p id="modalQuality"></p><p id="modalPrice" style="font-weight:bold; font-size:16px;"></p>
+            <p id="modalLoc" style="margin:4px 0; font-size:12px; color:#a0aec0;"></p>
+            <p id="modalQuality" style="margin:4px 0; font-size:13px;"></p>
             <div id="modalActionBox"></div>
             <button class="btn btn-close" onclick="closeModal()">Zatvori</button>
         </div>
@@ -52,6 +54,9 @@
     <script>
         let score = parseFloat(localStorage.getItem('ag_score')) || 1000;
         let ownedPlots = JSON.parse(localStorage.getItem('ag_ownedPlots')) || [];
+        // Pamćenje nadogradnji: rečnik gde je ključ ID parcele, a vrednost objekat sa nivoima mašina
+        let plotUpgrades = JSON.parse(localStorage.getItem('ag_plotUpgrades')) || {};
+
         let mapData = [];
         for (let r = 0; r < 8; r++) {
             for (let c = 0; c < 8; c++) {
@@ -61,8 +66,10 @@
                 mapData.push({ id, r, c, region: reg, price: pr, baseIncome: inc, qual: 50 + (id % 7) * 25 });
             }
         }
+
         const grid = document.getElementById('mapGrid'), scoreEl = document.getElementById('scoreDisplay'), incEl = document.getElementById('incomeDisplay'), modal = document.getElementById('plotModal');
         let activeId = null;
+
         function buildMap() {
             grid.innerHTML = '';
             mapData.forEach(p => {
@@ -73,31 +80,66 @@
             });
             updateUI();
         }
+
+        function getPlotIncome(id) {
+            const p = mapData[id];
+            let base = p.baseIncome * (p.qual / 100);
+            let ups = plotUpgrades[id] || { sieve: 0, drill: 0 };
+            return base + (ups.sieve * 1) + (ups.drill * 10);
+        }
+
         function getIncome() {
             let t = 0;
-            mapData.forEach(p => { if (ownedPlots.includes(p.id)) t += p.baseIncome * (p.qual / 100); });
+            ownedPlots.forEach(id => { t += getPlotIncome(id); });
             return t;
         }
+
         function updateUI() {
             scoreEl.innerText = Math.floor(score);
             incEl.innerText = getIncome().toFixed(1);
             localStorage.setItem('ag_score', score);
             localStorage.setItem('ag_ownedPlots', JSON.stringify(ownedPlots));
+            localStorage.setItem('ag_plotUpgrades', JSON.stringify(plotUpgrades));
         }
+
         function openPlot(id) {
             activeId = id; const p = mapData[id], owned = ownedPlots.includes(id);
+            if(!plotUpgrades[id]) plotUpgrades[id] = { sieve: 0, drill: 0 };
+            let ups = plotUpgrades[id];
+
             document.getElementById('modalTitle').innerText = p.region === "marsh" ? "Močvara" : p.region === "jungle" ? "Džungla" : "Kanjon";
             document.getElementById('modalLoc').innerText = `Pozicija: ${p.r+1}, ${p.c+1}`;
-            document.getElementById('modalQuality').innerText = `Kvalitet: ${p.qual}% (${(p.baseIncome*(p.qual/100)).toFixed(1)}/sek)`;
-            document.getElementById('modalPrice').innerText = owned ? "VLASNIŠTVO: Plac aktivno rudari!" : `Cena: ${p.price} poena`;
-            document.getElementById('modalActionBox').innerHTML = owned ? '' : `<button class="btn btn-buy" onclick="buyPlot(${p.price})">Kupi plac</button>`;
+            document.getElementById('modalQuality').innerText = `Trenutna proizvodnja: ${getPlotIncome(id).toFixed(1)}/sek`;
+            
+            let box = document.getElementById('modalActionBox');
+            if (owned) {
+                box.innerHTML = `
+                    <p style="color:#ffb703; font-weight:bold; margin:5px 0;">⚙️ MAŠINE NA PLACU:</p>
+                    <div class="up-box"><div>Sito (Lvl ${ups.sieve})<br><small style="color:#a0aec0">+1/sek</small></div><button class="btn btn-up" onclick="buyMach('sieve', 200)">Nadogradi (200)</button></div>
+                    <div class="up-box"><div>Bager (Lvl ${ups.drill})<br><small style="color:#a0aec0">+10/sek</small></div><button class="btn btn-up" onclick="buyMach('drill', 1500)">Nadogradi (1500)</button></div>
+                `;
+            } else {
+                box.innerHTML = `<p style="font-weight:bold; margin:10px 0;">Cena: ${p.price} poena</p><button class="btn btn-buy" onclick="buyPlot(${p.price})">Kupi ovaj plac</button>`;
+            }
             modal.style.display = 'flex';
         }
+
         function closeModal() { modal.style.display = 'none'; }
+        
         function buyPlot(pr) {
-            if (score >= pr) { score -= pr; ownedPlots.push(activeId); closeModal(); buildMap(); }
+            if (score >= pr) { score -= pr; ownedPlots.push(activeId); plotUpgrades[activeId] = { sieve: 0, drill: 0 }; closeModal(); buildMap(); }
             else { alert('Nemate dovoljno poena!'); }
         }
+
+        function buyMach(type, cost) {
+            if (score >= cost) {
+                score -= cost;
+                plotUpgrades[activeId][type] += 1;
+                openPlot(activeId);
+                updateUI();
+            } else { alert('Nemate dovoljno poena!'); }
+        }
+
         setInterval(() => { let inc = getIncome(); if (inc > 0) { score += inc / 10; updateUI(); } }, 100);
         buildMap();
     </script>
