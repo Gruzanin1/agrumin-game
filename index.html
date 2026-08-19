@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agrumin: Prva Ekspedicija</title>
+    <title>Agrumin: 2D Carstvo Parcela</title>
     <style>
         * {
             box-sizing: border-box;
@@ -24,89 +24,102 @@
         }
         .header {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 10px;
+            width: 100%;
         }
         .title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
-            letter-spacing: 2px;
             color: #00ffcc;
             text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
             margin: 0;
         }
         .score-container {
-            font-size: 36px;
+            font-size: 28px;
             font-weight: 800;
-            margin: 10px 0;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .coin-icon {
-            color: #00ffcc;
-            text-shadow: 0 0 8px #00ffcc;
-        }
-        .game-space {
-            flex: 1;
+            margin: 5px 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
-            width: 100%;
+            gap: 8px;
         }
-        .crystal {
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, #00ffff 0%, #0055ff 70%, #0b0f19 100%);
-            clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
-            cursor: pointer;
-            transition: transform 0.05s ease;
-            position: relative;
-        }
-        .crystal:active {
-            transform: scale(0.95);
-        }
-        .footer {
-            width: 100%;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            background: rgba(11, 15, 25, 0.8);
-            border-top: 1px solid rgba(0, 255, 204, 0.2);
-        }
-        .energy-container {
-            width: 90%;
-            max-width: 400px;
-        }
-        .energy-text {
+        .income-text {
             font-size: 14px;
-            color: #a0aec0;
+            color: #00bbff;
+            margin-top: -5px;
             margin-bottom: 5px;
+        }
+        .map-container {
+            flex: 1;
+            width: 100%;
+            max-width: 440px;
+            padding: 10px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
         }
-        .energy-bar {
+        .grid-map {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 4px;
             width: 100%;
-            height: 12px;
-            background: #1a202c;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid rgba(0, 255, 204, 0.3);
+            aspect-ratio: 1 / 1;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 204, 0.2);
         }
-        .energy-fill {
-            height: 100%;
+        .plot {
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            border: 1px solid rgba(0,0,0,0.3);
+        }
+        .plot:active {
+            transform: scale(0.9);
+        }
+        .reg-marsh { background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%); }
+        .reg-jungle { background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%); }
+        .reg-canyon { background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%); }
+        
+        .plot.owned {
+            background: linear-gradient(135deg, #b58900 0%, #ffb703 100%) !important;
+            box-shadow: inset 0 0 8px rgba(255,255,255,0.6), 0 0 8px rgba(255, 183, 3, 0.4);
+            border: 1px solid #ffffff;
+            position: relative;
+        }
+        .plot.owned::after {
+            content: '⛏️';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+        }
+        .footer-info {
             width: 100%;
-            background: linear-gradient(90deg, #00ffcc, #00bbff);
-            transition: width 0.1s linear;
+            padding: 15px;
+            background: rgba(11, 15, 25, 0.9);
+            border-top: 1px solid rgba(0, 255, 204, 0.2);
+            text-align: center;
         }
-        .nav-buttons {
-            width: 90%;
-            max-width: 400px;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 5, 10, 0.85);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #0b0f19;
+            width: 85%;
+            max-width: 360px;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #00ffcc;
+            text-align: center;
         }
         .btn {
             width: 100%;
@@ -116,215 +129,171 @@
             font-weight: bold;
             font-size: 16px;
             cursor: pointer;
-            text-align: center;
+            margin-top: 10px;
         }
-        .btn-primary {
-            background: #00ffcc;
-            color: #02050a;
-            box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(2, 5, 10, 0.9);
-            z-index: 10;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: #0b0f19;
-            width: 90%;
-            max-width: 400px;
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #00ffcc;
-            text-align: center;
-        }
-        .shop-item {
-            background: #1a202c;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
+        .btn-buy { background: #00ffcc; color: #02050a; }
+        .btn-close { background: #2d3748; color: white; }
+        .legend {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 11px;
+            margin-bottom: 5px;
         }
-        .shop-item-info {
-            text-align: left;
-        }
-        .shop-item-title {
-            font-weight: bold;
-            color: #ffffff;
-        }
-        .shop-item-desc {
-            font-size: 12px;
-            color: #a0aec0;
-        }
-        .btn-shop {
-            background: #00bbff;
-            color: #ffffff;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .floating-text {
-            position: absolute;
-            color: #00ffcc;
-            font-size: 24px;
-            font-weight: bold;
-            pointer-events: none;
-            animation: floatUp 0.6s ease-out forwards;
-            text-shadow: 0 0 5px rgba(0,255,204,0.8);
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-60px); }
-        }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .legend-box { width: 12px; height: 12px; border-radius: 2px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <p class="title">AGRUMIN POENI</p>
+        <p class="title">AGRUMIN: MAPA PARCELA</p>
         <div class="score-container">
-            <span class="coin-icon">✨</span>
-            <span id="score">0</span>
+            <span>✨</span>
+            <span id="scoreDisplay">0</span>
+        </div>
+        <div class="income-text">Pasivna zarada: +<span id="incomeDisplay">0</span> poena/sek</div>
+        
+        <div class="legend">
+            <div class="legend-item"><div class="legend-box reg-marsh"></div>Močvara (500)</div>
+            <div class="legend-item"><div class="legend-box reg-jungle"></div>Džungla (2500)</div>
+            <div class="legend-item"><div class="legend-box reg-canyon"></div>Kanjon (10000)</div>
         </div>
     </div>
 
-    <div class="game-space" id="gameSpace">
-        <div class="crystal" id="crystal"></div>
+    <div class="map-container">
+        <div class="grid-map" id="mapGrid"></div>
     </div>
 
-    <div class="footer">
-        <div class="energy-container">
-            <div class="energy-text">
-                <span>Energija</span>
-                <span id="energyText">1000 / 1000</span>
-            </div>
-            <div class="energy-bar">
-                <div class="energy-fill" id="energyFill"></div>
-            </div>
-        </div>
-        <div class="nav-buttons">
-            <button class="btn btn-primary" onclick="toggleShop(true)">🛒 Prodavnica</button>
-        </div>
+    <div class="footer-info">
+        <span style="color: #a0aec0; font-size: 13px;">Kliknite na bilo koje polje na mapi da vidite detalje ili kupite plac.</span>
     </div>
 
-    <div class="modal" id="shopModal">
+    <div class="modal" id="plotModal">
         <div class="modal-content">
-            <h2 style="color: #00ffcc; margin-top:0;">Oprema za poene</h2>
-            
-            <div class="shop-item">
-                <div class="shop-item-info">
-                    <div class="shop-item-title">Čelični kramp</div>
-                    <div class="shop-item-desc">+5 Poena po kliku</div>
-                </div>
-                <button class="btn btn-shop" onclick="buyUpgrade('pickaxe', 200)">Cena: 200</button>
-            </div>
-
-            <div class="shop-item">
-                <div class="shop-item-info">
-                    <div class="shop-item-title">Auto-bušilica</div>
-                    <div class="shop-item-desc">+10 Poena/sekundi</div>
-                </div>
-                <button class="btn btn-shop" onclick="buyUpgrade('drill', 1000)">Cena: 1000</button>
-            </div>
-
-            <button class="btn" style="background: #2d3748; color: white; margin-top: 15px;" onclick="toggleShop(false)">Zatvori</button>
+            <h3 id="modalTitle" style="color: #00ffcc; margin-top:0;">Parcela</h3>
+            <p id="modalLoc"></p>
+            <p id="modalQuality"></p>
+            <p id="modalPrice" style="font-weight: bold; font-size: 18px;"></p>
+            <div id="modalActionBox"></div>
+            <button class="btn btn-close" onclick="closeModal()">Zatvori</button>
         </div>
     </div>
-
     <script>
-        let score = parseFloat(localStorage.getItem('agrumin_score')) || 0;
-        let energy = parseInt(localStorage.getItem('agrumin_energy')) || 1000;
-        const maxEnergy = 1000;
-        let clickPower = parseInt(localStorage.getItem('agrumin_clickPower')) || 1;
-        let autoIncome = parseInt(localStorage.getItem('agrumin_autoIncome')) || 0;
+        let score = parseFloat(localStorage.getItem('ag_score')) || 1000;
+        let ownedPlots = JSON.parse(localStorage.getItem('ag_ownedPlots')) || [];
 
-        const scoreEl = document.getElementById('score');
-        const energyTextEl = document.getElementById('energyText');
-        const energyFillEl = document.getElementById('energyFill');
-        const crystalEl = document.getElementById('crystal');
-        const gameSpaceEl = document.getElementById('gameSpace');
-        const shopModalEl = document.getElementById('shopModal');
+        let mapData = [];
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                let id = row * 8 + col;
+                let region = "marsh";
+                let price = 500;
+                let baseIncome = 1;
 
-        updateUI();
-
-               crystalEl.addEventListener('click', (e) => {
-            if (energy >= clickPower) {
-                score += clickPower;
-                energy -= clickPower;
-                saveData();
-                updateUI();
-                createFloatingText(e.clientX, e.clientY, `+${clickPower}`);
-            }
-        });
-
-        function createFloatingText(x, y, text) {
-            const el = document.createElement('div');
-            el.className = 'floating-text';
-            el.innerText = text;
-            el.style.left = `${x - 15}px`;
-            el.style.top = `${y - 30}px`;
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 600);
-        }
-
-        function updateUI() {
-            scoreEl.innerText = Math.floor(score);
-            energyTextEl.innerText = `${energy} / ${maxEnergy}`;
-            const percentage = (energy / maxEnergy) * 100;
-            energyFillEl.style.width = `${percentage}%`;
-        }
-
-        function saveData() {
-            localStorage.setItem('agrumin_score', score);
-            localStorage.setItem('agrumin_energy', energy);
-            localStorage.setItem('agrumin_clickPower', clickPower);
-            localStorage.setItem('agrumin_autoIncome', autoIncome);
-        }
-
-        function toggleShop(show) {
-            shopModalEl.style.display = show ? 'flex' : 'none';
-        }
-
-        function buyUpgrade(type, cost) {
-            if (score >= cost) {
-                score -= cost;
-                if (type === 'pickaxe') {
-                    clickPower += 5;
-                    alert('Kupili ste Čelični kramp!');
-                } else if (type === 'drill') {
-                    autoIncome += 10;
-                    alert('Kupili ste Auto-bušilicu!');
+                if (row >= 3 && row <= 4 && col >= 3 && col <= 4) {
+                    region = "canyon";
+                    price = 10000;
+                    baseIncome = 25;
+                } else if (row >= 1 && row <= 6 && col >= 1 && col <= 6) {
+                    region = "jungle";
+                    price = 2500;
+                    baseIncome = 6;
                 }
-                saveData();
-                updateUI();
-                toggleShop(false);
+
+                let quality = 50 + (id % 7) * 25;
+                mapData.push({ id, row, col, region, price, baseIncome, quality });
+            }
+        }
+
+        const gridEl = document.getElementById('mapGrid');
+        const scoreDisplayEl = document.getElementById('scoreDisplay');
+        const incomeDisplayEl = document.getElementById('incomeDisplay');
+        const modalEl = document.getElementById('plotModal');
+
+        let activePlotId = null;
+
+        function buildMap() {
+            gridEl.innerHTML = '';
+            mapData.forEach(plot => {
+                const cell = document.createElement('div');
+                cell.className = `plot reg-${plot.region}`;
+                if (ownedPlots.includes(plot.id)) {
+                    cell.classList.add('owned');
+                }
+                cell.onclick = () => openPlotDetails(plot.id);
+                gridEl.appendChild(cell);
+            });
+            updateHeader();
+        }
+
+        function calculateTotalIncome() {
+            let total = 0;
+            mapData.forEach(plot => {
+                if (ownedPlots.includes(plot.id)) {
+                    total += plot.baseIncome * (plot.quality / 100);
+                }
+            });
+            return total;
+        }
+
+        function updateHeader() {
+            scoreDisplayEl.innerText = Math.floor(score);
+            incomeDisplayEl.innerText = calculateTotalIncome().toFixed(1);
+            localStorage.setItem('ag_score', score);
+            localStorage.setItem('ag_ownedPlots', JSON.stringify(ownedPlots));
+        }
+
+        function openPlotDetails(id) {
+            activePlotId = id;
+            const plot = mapData[id];
+            const isOwned = ownedPlots.includes(id);
+
+            let regName = plot.region === "marsh" ? "Fluorescentna Močvara" : plot.region === "jungle" ? "Maglovita Džungla" : "Lebdeći Kanjon";
+            
+            document.getElementById('modalTitle').innerText = regName;
+            document.getElementById('modalLoc').innerText = `Lokacija: Red ${plot.row + 1}, Polje ${plot.col + 1}`;
+            document.getElementById('modalQuality').innerText = `Kvalitet: ${plot.quality}% (${(plot.baseIncome * (plot.quality/100)).toFixed(1)} poena/sek)`;
+            
+            const actionBox = document.getElementById('modalActionBox');
+            const priceEl = document.getElementById('modalPrice');
+
+            if (isOwned) {
+                priceEl.innerText = "VLASNIŠTVO: Vaš plac aktivno rudari!";
+                actionBox.innerHTML = '';
+            } else {
+                priceEl.innerText = `Cena: ${plot.price} poena`;
+                actionBox.innerHTML = `<button class="btn btn-buy" onclick="buyPlot(${plot.price})">Kupi ovaj plac</button>`;
+            }
+
+            modalEl.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modalEl.style.display = 'none';
+        }
+
+        function buyPlot(price) {
+            if (score >= price) {
+                score -= price;
+                ownedPlots.push(activePlotId);
+                closeModal();
+                buildMap();
+                alert('Uspešno kupljen plac!');
             } else {
                 alert('Nemate dovoljno poena!');
             }
         }
 
         setInterval(() => {
-            let changed = false;
-            if (autoIncome > 0) {
-                score += autoIncome / 10;
-                changed = true;
-            }
-            if (energy < maxEnergy) {
-                energy = Math.min(maxEnergy, energy + 1);
-                changed = true;
-            }
-            if (changed) {
-                saveData();
-                updateUI();
+            let income = calculateTotalIncome();
+            if (income > 0) {
+                score += income / 10;
+                updateHeader();
             }
         }, 100);
+
+        buildMap();
     </script>
 </body>
 </html>
