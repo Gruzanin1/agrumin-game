@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrumin: Prva Ekspedicija</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0b0f19 0%, #02050a 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .header {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #00ffcc;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+            margin: 0;
+        }
+        .score-container {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 10px 0;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .coin-icon {
+            color: #00ffcc;
+            text-shadow: 0 0 8px #00ffcc;
+        }
+        .game-space {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+        }
+        .crystal {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, #00ffff 0%, #0055ff 70%, #0b0f19 100%);
+            clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+            cursor: pointer;
+            transition: transform 0.05s ease;
+            position: relative;
+        }
+        .crystal:active {
+            transform: scale(0.95);
+        }
+        .footer {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            background: rgba(11, 15, 25, 0.8);
+            border-top: 1px solid rgba(0, 255, 204, 0.2);
+        }
+        .energy-container {
+            width: 90%;
+            max-width: 400px;
+        }
+        .energy-text {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .energy-bar {
+            width: 100%;
+            height: 12px;
+            background: #1a202c;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+        }
+        .energy-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #00ffcc, #00bbff);
+            transition: width 0.1s linear;
+        }
+        .nav-buttons {
+            width: 90%;
+            max-width: 400px;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-primary {
+            background: #00ffcc;
+            color: #02050a;
+            box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 5, 10, 0.9);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #0b0f19;
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #00ffcc;
+            text-align: center;
+        }
+        .shop-item {
+            background: #1a202c;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .shop-item-info {
+            text-align: left;
+        }
+        .shop-item-title {
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .shop-item-desc {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        .btn-shop {
+            background: #00bbff;
+            color: #ffffff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .floating-text {
+            position: absolute;
+            color: #00ffcc;
+            font-size: 24px;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            text-shadow: 0 0 5px rgba(0,255,204,0.8);
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-60px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <p class="title">AGRUMIN</p>
+        <div class="score-container">
+            <span class="coin-icon">⏣</span>
+            <span id="score">0</span>
+        </div>
+    </div>
+
+    <div class="game-space" id="gameSpace">
+        <div class="crystal" id="crystal"></div>
+    </div>
+
+    <div class="footer">
+        <div class="energy-container">
+            <div class="energy-text">
+                <span>Energija</span>
+                <span id="energyText">1000 / 1000</span>
+            </div>
+            <div class="energy-bar">
+                <div class="energy-fill" id="energyFill"></div>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-primary" onclick="toggleShop(true)">🛒 Prodavnica</button>
+        </div>
+    </div>
+
+    <div class="modal" id="shopModal">
+        <div class="modal-content">
+            <h2 style="color: #00ffcc; margin-top:0;">Oprema za rudarenje</h2>
+            
+            <div class="shop-item">
+                <div class="shop-item-info">
+                    <div class="shop-item-title">Čelični kramp</div>
+                    <div class="shop-item-desc">+5 Agruma po kliku</div>
+                </div>
+                <button class="btn btn-shop" onclick="buyUpgrade('pickaxe', 200)">Cena: 200</button>
+            </div>
+
+            <div class="shop-item">
+                <div class="shop-item-info">
+                    <div class="shop-item-title">Auto-bušilica</div>
+                    <div class="shop-item-desc">+10 Agruma/sekundi</div>
+                </div>
+                <button class="btn btn-shop" onclick="buyUpgrade('drill', 1000)">Cena: 1000</button>
+            </div>
+
+            <button class="btn" style="background: #2d3748; color: white; margin-top: 15px;" onclick="toggleShop(false)">Zatvori</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let energy = 1000;
+        const maxEnergy = 1000;
+        let clickPower = 1;
+        let autoIncome = 0;
+
+        const scoreEl = document.getElementById('score');
+        const energyTextEl = document.getElementById('energyText');
+        const energyFillEl = document.getElementById('energyFill');
+        const crystalEl = document.getElementById('crystal');
+        const gameSpaceEl = document.getElementById('gameSpace');
+        const shopModalEl = document.getElementById('shopModal');
+
+        crystalEl.addEventListener('click', (e) => {
+            if (energy >= clickPower) {
+                score += clickPower;
+                energy -= clickPower;
+                updateUI();
+                createFloatingText(e.clientX, e.clientY, `+${clickPower}`);
+            }
+        });
+
+        function createFloatingText(x, y, text) {
+            const el = document.createElement('div');
+            el.className = 'floating-text';
+            el.innerText = text;
+            el.style.left = `${x - 15}px`;
+            el.style.top = `${y - 30}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 600);
+        }
+
+        function updateUI() {
+            scoreEl.innerText = Math.floor(score);
+            energyTextEl.innerText = `${energy} / ${maxEnergy}`;
+            const percentage = (energy / maxEnergy) * 100;
+            energyFillEl.style.width = `${percentage}%`;
+        }
+
+        function toggleShop(show) {
+            shopModalEl.style.display = show ? 'flex' : 'none';
+        }
+
+        function buyUpgrade(type, cost) {
+            if (score >= cost) {
+                score -= cost;
+                if (type === 'pickaxe') {
+                    clickPower += 5;
+                    alert('Kupili ste Čelični kramp!');
+                } else if (type === 'drill') {
+                    autoIncome += 10;
+                    alert('Kupili ste Auto-bušilicu!');
+                }
+                updateUI();
+                toggleShop(false);
+            } else {
+                alert('Nemate dovoljno Agrum poena!');
+            }
+        }
+
+        setInterval(() => {
+            if (autoIncome > 0) {
+                score += autoIncome / 10;
+            }
+            if (energy < maxEnergy) {
+                energy = Math.min(maxEnergy, energy + 1);
+            }
+            updateUI();
+        }, 100);
+    </script>
+</body>
+</html>
