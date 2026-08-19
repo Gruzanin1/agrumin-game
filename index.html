@@ -187,9 +187,9 @@
 <body>
 
     <div class="header">
-        <p class="title">AGRUMIN</p>
+        <p class="title">AGRUMIN POENI</p>
         <div class="score-container">
-            <span class="coin-icon">⏣</span>
+            <span class="coin-icon">✨</span>
             <span id="score">0</span>
         </div>
     </div>
@@ -215,12 +215,12 @@
 
     <div class="modal" id="shopModal">
         <div class="modal-content">
-            <h2 style="color: #00ffcc; margin-top:0;">Oprema za rudarenje</h2>
+            <h2 style="color: #00ffcc; margin-top:0;">Oprema za poene</h2>
             
             <div class="shop-item">
                 <div class="shop-item-info">
                     <div class="shop-item-title">Čelični kramp</div>
-                    <div class="shop-item-desc">+5 Agruma po kliku</div>
+                    <div class="shop-item-desc">+5 Poena po kliku</div>
                 </div>
                 <button class="btn btn-shop" onclick="buyUpgrade('pickaxe', 200)">Cena: 200</button>
             </div>
@@ -228,7 +228,7 @@
             <div class="shop-item">
                 <div class="shop-item-info">
                     <div class="shop-item-title">Auto-bušilica</div>
-                    <div class="shop-item-desc">+10 Agruma/sekundi</div>
+                    <div class="shop-item-desc">+10 Poena/sekundi</div>
                 </div>
                 <button class="btn btn-shop" onclick="buyUpgrade('drill', 1000)">Cena: 1000</button>
             </div>
@@ -286,15 +286,15 @@
                 score -= cost;
                 if (type === 'pickaxe') {
                     clickPower += 5;
-                    alert('Kupili ste Čelični kramp!');
+                    alert('Kupili ste Čelični kramp! Jači klikovi za brže sakupljanje.');
                 } else if (type === 'drill') {
                     autoIncome += 10;
-                    alert('Kupili ste Auto-bušilicu!');
+                    alert('Kupili ste Auto-bušilicu! Poeni se sada skupljaju sami.');
                 }
                 updateUI();
                 toggleShop(false);
             } else {
-                alert('Nemate dovoljno Agrum poena!');
+                alert('Nemate dovoljno poena!');
             }
         }
 
