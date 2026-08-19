@@ -254,7 +254,7 @@
 
         updateUI();
 
-        crystalEl.addEventListener('click', (e) => {
+               crystalEl.addEventListener('click', (e) => {
             if (energy >= clickPower) {
                 score += clickPower;
                 energy -= clickPower;
@@ -306,22 +306,25 @@
                 updateUI();
                 toggleShop(false);
             } else {
-alert('Nemate dovoljno poena!');
-}
-}
+                alert('Nemate dovoljno poena!');
+            }
+        }
 
-setInterval(() => {
-let changed = false;
-if (autoIncome > 0) {
-score += autoIncome / 10;
-changed = true;
-}
-if (energy < maxEnergy) {
-energy = Math.min(maxEnergy, energy + 1);
-changed = true;
-}
-if (changed) {
-saveData();
-updateUI();
-}
-}, 100);
+        setInterval(() => {
+            let changed = false;
+            if (autoIncome > 0) {
+                score += autoIncome / 10;
+                changed = true;
+            }
+            if (energy < maxEnergy) {
+                energy = Math.min(maxEnergy, energy + 1);
+                changed = true;
+            }
+            if (changed) {
+                saveData();
+                updateUI();
+            }
+        }, 100);
+    </script>
+</body>
+</html>
